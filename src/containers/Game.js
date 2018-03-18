@@ -20,6 +20,7 @@ class Game extends Component {
     this.state = {
       currentPlayer: {name: username},
       activePlayers: [],
+      arena: [],
       instruction: <button onClick={this.joinGame.bind(this)} className="btn btn-secondary">Join this Game</button>
     }
 
@@ -39,7 +40,17 @@ class Game extends Component {
         })
       }
     })
-
+    // listen for arena changes
+    firebase.database().ref("arena/").on("value", (snapshot) => {
+      console.log("updating")
+      const arena = snapshot.val()
+      if (arena){
+        console.log(arena)
+        this.setState({
+          arena: arena,
+        })
+      }
+    })
   }
 
   joinGame(){
@@ -62,15 +73,35 @@ class Game extends Component {
   shoot(event){
     console.log("SHoot!")
     // send the attack (rock, paper, scissors) to the board
-    firebase.database().ref("arena/"+this.props.username).set(event.target.id)
+    var attack = {name: this.props.username, weapon:event.target.id}
+    if (this.state.arena.length > 0){
+      var id = 1
+    }
+    else{var id = 0}
+    firebase.database().ref("arena/"+id).set(attack)
   }
+
   render(){
+    // map players to list of jsx elements
     if (this.state.activePlayers.length > 0){
       var activePlayers = this.state.activePlayers.map((player, i) => {
         return (<span key={i}> {player.name} </span>)
       })
     }
-    else{var activePlayers = "there are no players in this game yet"}
+    else {var activePlayers = "there are no players in this game yet"}
+    // map arena to list of jsx elements
+    console.log("ARENA")
+    console.log(this.state.arena)
+    if (this.state.arena.length > 0){
+      var attacks = this.state.arena.map((attack, i) => {
+        return(
+          <div key={i}>
+            <div>{attack.name}</div>
+            <div>{attack.weapon}</div>
+          </div>
+        )
+      })
+    }
     return (
       <div>
         <h2 className="border-bottom">Game</h2>
@@ -79,6 +110,7 @@ class Game extends Component {
             {activePlayers}
           </div>
           <div className="card-body">
+            {attacks}
             {this.state.instruction}
           </div>
         </div>
