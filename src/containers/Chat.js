@@ -66,10 +66,12 @@ class Chat extends Component {
         <h2 className="border-bottom">Chat</h2>
         <ul className="list-group">
           {currentMessages}
+          <form className="form-inline list-group-item">
+            <input onChange={this.updateMessage.bind(this)} className="form-control" type="text" placeholder="Message..."/>
+            <button onClick={this.submitMessage.bind(this)} id="submit" type="button" className="btn btn-secondary">send</button>
+          </form>
         </ul>
         <span className="font-weight-bold">username: </span><span>{this.props.username}</span>
-        <input onChange={this.updateMessage.bind(this)} className="form-group form-control" type="text" placeholder="Message..."/><br />
-        <button onClick={this.submitMessage.bind(this)} id="submit" type="button" className="btn btn-secondary">send</button>
       </div>
     )
   }
