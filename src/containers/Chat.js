@@ -26,23 +26,22 @@ class Chat extends Component {
   }
 
   componentDidMount(){
-    console.log("mounted")
     // pull data from firebase
     firebase.database().ref("messages/").on('value', (snapshot) => {
-      console.log("database has changed")
-      console.log(snapshot.val())
       const currentMessages = snapshot.val()
-      console.log(currentMessages)
+      if (currentMessages){
         this.setState({
           messages: currentMessages
-      })
+        })
+      }
     })
   }
 
   updateMessage(event){
-    // capture user activity in input field
+    // capture user activity in input field and set the state
+    let message = this.props.username + ": " + event.target.value
     this.setState({
-      message: event.target.value
+      message: message
     })
   }
 
@@ -51,25 +50,24 @@ class Chat extends Component {
       id: this.state.messages.length,
       text: this.state.message
     }
-    // var updatedMessages = Object.assign([], this.state.messages)
-    // updatedMessages.push(nextMessage)
-    // this.setState({
-    //   message: "",
-    //   messages: updatedMessages
-    // })
+    // add the message to the databse....we don't need to update state
+    // because our firebase function in componentDidMount is listening to
+    // changes in the databse and it updates the state as part of its callback
     firebase.database().ref('messages/'+nextMessage.id).set(nextMessage)
   }
   render(){
+    // map this list elements of state to jsx elements
     var currentMessages = this.state.messages.map((message) =>{
-      return (<li key={message.id}>{message.text}</li>)
+      return (<li className="list-group-item" key={message.id}>{message.text}</li>)
     })
 
     return(
       <div>
         <h2 className="border-bottom">Chat</h2>
-        <ol className="border border-primary">
+        <ul className="list-group">
           {currentMessages}
-        </ol>
+        </ul>
+        <span className="font-weight-bold">username: </span><span>{this.props.username}</span>
         <input onChange={this.updateMessage.bind(this)} className="form-group form-control" type="text" placeholder="Message..."/><br />
         <button onClick={this.submitMessage.bind(this)} id="submit" type="button" className="btn btn-secondary">send</button>
       </div>

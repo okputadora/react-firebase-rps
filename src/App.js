@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
-import Game from './containers/Game'
-import Chat from './containers/Chat'
+import Board from './containers/Board'
+import Homepage from './containers/Homepage'
 
 class App extends Component {
+  constructor(){
+    super()
+    this.state = {
+      currentWindow: <Homepage onLoad={(username) => this.loadBoard(username)}/>
+    }
+  }
+
+  loadBoard(username){
+    console.log(username)
+    this.setState({
+      currentWindow: <Board username={username}/>
+    })
+  }
+
   render() {
     return (
     <div>
       <div className="jumbotron bg-dark text-light text-center">
         <h1>Rock, Paper, Scissors.</h1>
       </div>
-      <div className="container">
-        <div className="row">
-          <div className="col-md-8">
-            <Game />
-          </div>
-          <div className="col-md-4">
-            <Chat />
-          </div>
-        </div>
-      </div>
+      {this.state.currentWindow}
     </div>
       );
   }
