@@ -11,7 +11,6 @@ class App extends Component {
   }
 
   loadBoard(username){
-    console.log(username)
     this.setState({
       currentWindow: <Board username={username}/>
     })

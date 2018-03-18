@@ -50,7 +50,8 @@ class Chat extends Component {
       id: this.state.messages.length,
       text: this.state.message
     }
-    // add the message to the databse....we don't need to update state
+    // add the message to the databse and set its id to length of the messages
+    // ...we don't need to update state
     // because our firebase function in componentDidMount is listening to
     // changes in the databse and it updates the state as part of its callback
     firebase.database().ref('messages/'+nextMessage.id).set(nextMessage)
