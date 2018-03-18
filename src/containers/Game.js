@@ -45,7 +45,9 @@ class Game extends Component {
       console.log("updating")
       const arena = snapshot.val()
       if (arena){
-        console.log(arena)
+        if (arena.length === 2){
+          this.evaluateWinner(arena)
+        }
         this.setState({
           arena: arena,
         })
@@ -81,6 +83,46 @@ class Game extends Component {
     firebase.database().ref("arena/"+id).set(attack)
   }
 
+  evaluateWinner(arena){
+    console.log("Evaluating winner")
+    var winner;
+    var weapon1 = arena[0].weapon
+    var weapon2 = arena[1].weapon
+    console.log(weapon1)
+    console.log(weapon2)
+    if (weapon1 === "rock"){
+      if (weapon2 === "rock"){
+        winner = "tie"
+      }
+      else if(weapon2 === "paper"){
+        winner = arena[1].name
+      }
+      else{winner = arena[0].name}
+    }
+    else if(weapon1 === "paper"){
+      if (weapon2 === "paper"){
+        winner = "tie"
+      }
+      else if (weapon2 === "scissors"){
+        winner = arena[1].name
+      }
+      else{winner = arena[0].name}
+    }
+    else{
+      if (weapon2 === "scissors"){
+        winner = "tie"
+      }
+      else if (weapon2 === "rock"){
+        winner = arena[1].name
+      }
+      else{winner = arena[0].name}
+    }
+
+    this.setState({
+      instruction: "winner: " + winner
+    })
+  }
+
   render(){
     // map players to list of jsx elements
     if (this.state.activePlayers.length > 0){
@@ -96,8 +138,7 @@ class Game extends Component {
       var attacks = this.state.arena.map((attack, i) => {
         return(
           <div key={i}>
-            <div>{attack.name}</div>
-            <div>{attack.weapon}</div>
+            <div>{attack.name}: <span>{attack.weapon}</span></div>
           </div>
         )
       })
