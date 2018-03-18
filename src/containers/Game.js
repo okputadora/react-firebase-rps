@@ -19,7 +19,8 @@ class Game extends Component {
     const username = this.props.username
     this.state = {
       currentPlayer: {name: username},
-      activePlayers: []
+      activePlayers: [],
+      instruction: <button onClick={this.joinGame.bind(this)} className="btn btn-secondary">Join this Game</button>
     }
 
   }
@@ -30,11 +31,11 @@ class Game extends Component {
     // usernames into that object
     firebase.database().ref("players/").on("value", (snapshot) => {
       console.log("updating")
-      const currentPlayers = snapshot.val()
-      if (currentPlayers){
-        console.log(currentPlayers)
+      const activePlayers = snapshot.val()
+      if (activePlayers){
+        console.log(activePlayers)
         this.setState({
-          activePlayers: currentPlayers
+          activePlayers: activePlayers,
         })
       }
     })
@@ -44,12 +45,29 @@ class Game extends Component {
   joinGame(){
     console.log("Joined")
     var id = this.state.activePlayers.length
-    firebase.database().ref("players/"+id).set(this.state.currentPlayer)
+    if (id === 1){
+      var instruction = <p>choose an attack. when both players have thrown their attack the winner will be revealed</p>
+      firebase.database().ref("players/"+id).set(this.state.currentPlayer)
+    }
+    else if (id === 0){
+      firebase.database().ref("players/"+id).set(this.state.currentPlayer)
+      instruction = <p>waiting for one other player...</p>
+    }
+    else{instruction = <p>there are already two players playing. try back in a bit.</p>}
+    this.setState({
+      instruction: instruction
+    })
+  }
+
+  shoot(event){
+    console.log("SHoot!")
+    // send the attack (rock, paper, scissors) to the board
+    firebase.database().ref("arena/"+this.props.username).set(event.target.id)
   }
   render(){
     if (this.state.activePlayers.length > 0){
-      var activePlayers = this.state.activePlayers.map((player) => {
-        return (<span> {player.name} </span>)
+      var activePlayers = this.state.activePlayers.map((player, i) => {
+        return (<span key={i}> {player.name} </span>)
       })
     }
     else{var activePlayers = "there are no players in this game yet"}
@@ -61,13 +79,13 @@ class Game extends Component {
             {activePlayers}
           </div>
           <div className="card-body">
-            <button onClick={this.joinGame.bind(this)}className="btn btn-secondary">Join this Game</button>
+            {this.state.instruction}
           </div>
         </div>
         <div className="btn-group" role="group">
-          <button id="rock" type="button" className="btn btn-secondary">Rock</button>
-          <button id="paper" type="button" className="btn btn-secondary">Paper</button>
-          <button id="scissors" type="button" className="btn btn-secondary">Scissors</button>
+          <button onClick={this.shoot.bind(this)} id="rock" type="button" className="btn btn-secondary">Rock</button>
+          <button onClick={this.shoot.bind(this)} id="paper" type="button" className="btn btn-secondary">Paper</button>
+          <button onClick={this.shoot.bind(this)} id="scissors" type="button" className="btn btn-secondary">Scissors</button>
         </div>
       </div>
     )
