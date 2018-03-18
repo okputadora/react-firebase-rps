@@ -77,10 +77,10 @@ class Game extends Component {
     // send the attack (rock, paper, scissors) to the board
     var attack = {name: this.props.username, weapon:event.target.id}
     if (this.state.arena.length > 0){
-      var id = 1
+      var attackId = 1
     }
-    else{var id = 0}
-    firebase.database().ref("arena/"+id).set(attack)
+    else{var attackId = 0}
+    firebase.database().ref("arena/"+attackId).set(attack)
   }
 
   evaluateWinner(arena){
@@ -117,8 +117,10 @@ class Game extends Component {
       }
       else{winner = arena[0].name}
     }
-
+    // remove the arena to make way for the next round
+    firebase.database().ref("arena/").set(null)
     this.setState({
+      arena: [],
       instruction: "winner: " + winner
     })
   }
