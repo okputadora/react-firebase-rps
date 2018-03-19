@@ -26,6 +26,11 @@ class Game extends Component {
         this.setState({
           activePlayers: activePlayers,
         })
+        if (activePlayers.length == 2){
+          this.setState({
+            instruction: "choose an attack. when both players have thrown their attack the winner will be revealed."
+          })
+        }
       }
     })
     // listen for arena changes
@@ -37,34 +42,32 @@ class Game extends Component {
       console.log("updating arena")
       const arena = snapshot.val()
       if (arena){
-        if (arena[0]){
-          console.log("arena "+JSON.stringify(arena))
-          if (arena.length === 2){
-            console.log("arena length === 2")
-            this.evaluateWinner(arena)
+        console.log("arena "+JSON.stringify(arena))
+        if (this.state.arena.length === 2){
+          console.log("arena length === 2")
+          this.evaluateWinner(arena)
+          this.setState({
+            arena: arena
+          })
+          console.log("STate arena: " + JSON.stringify(this.state.arena))
+          setTimeout(() => {
             this.setState({
-              arena: arena
+              arena: []
             })
-            console.log("STate arena: " + JSON.stringify(this.state.arena))
-            setTimeout(() => {
-              this.setState({
-                arena: []
-              })
-            }, 1000)
-          }
-          else{
-            this.setState({
-              arena: arena,
-            })
-            console.log("STate arena: " + JSON.stringify(this.state.arena))
-          }
+          }, 1000)
         }
         else{
           this.setState({
-            arena: []
+            arena: arena,
           })
           console.log("STate arena: " + JSON.stringify(this.state.arena))
         }
+      }
+      else{
+        this.setState({
+          arena: []
+        })
+        console.log("STate arena: " + JSON.stringify(this.state.arena))
       }
     })
   }
@@ -94,6 +97,9 @@ class Game extends Component {
       var attackId = 1
     }
     else{attackId = 0}
+    this.setState({
+      instruction: ""
+    })
     firebase.database().ref("arena/"+attackId).set(attack)
   }
 
