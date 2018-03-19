@@ -58,6 +58,10 @@ class Game extends Component {
           arena: []
         })
       }
+
+      // listen for disconnect and clear everything out of the database
+      // after this happens -- NOTE this doesn't create a listenable change
+      firebase.database().ref().onDisconnect().set("disconnected")
     })
   }
 
