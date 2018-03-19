@@ -1,18 +1,6 @@
 import React, { Component } from 'react';
 import firebase from 'firebase'
 
-// Initialize Firebase
-// const firebaseInit = () => {
-//   let config = {
-//     apiKey: "AIzaSyCeaE6SXQq7-T5c7f1trAJEB7hv_mowjbs",
-//     authDomain: "react-rps.firebaseapp.com",
-//     databaseURL: "https://react-rps.firebaseio.com",
-//     projectId: "react-rps",
-//     storageBucket: "react-rps.appspot.com",
-//     messagingSenderId: "675830051613"
-//   };
-//   firebase.initializeApp(config);
-// }
 class Game extends Component {
   constructor(props){
     super(props)
@@ -41,16 +29,31 @@ class Game extends Component {
       }
     })
     // listen for arena changes
+    // note: when we remove the arena node it is not actually removed it
+    // is set to null. so instead of checking to see if the arena exists
+    // we should check to see if it has the weapon propert in the first value
+    // (for some reason it was not allowing us to just check if the value was null)
     firebase.database().ref("arena/").on("value", (snapshot) => {
-      console.log("updating")
+      console.log("updating arena")
       const arena = snapshot.val()
       if (arena){
-        if (arena.length === 2){
-          this.evaluateWinner(arena)
+        if (arena[0]){
+          console.log("arena "+JSON.stringify(arena))
+          if (arena.length === 2){
+            console.log("arena length === 2")
+            this.evaluateWinner(arena)
+          }
+          this.setState({
+            arena: arena,
+          })
+          console.log("STate arena: " + JSON.stringify(this.state.arena))
         }
-        this.setState({
-          arena: arena,
-        })
+        else{
+          this.setState({
+            arena: []
+          })
+          console.log("STate arena: " + JSON.stringify(this.state.arena))
+        }
       }
     })
   }
@@ -79,7 +82,7 @@ class Game extends Component {
     if (this.state.arena.length > 0){
       var attackId = 1
     }
-    else{var attackId = 0}
+    else{attackId = 0}
     firebase.database().ref("arena/"+attackId).set(attack)
   }
 
@@ -118,10 +121,13 @@ class Game extends Component {
       else{winner = arena[0].name}
     }
     // remove the arena to make way for the next round
-    firebase.database().ref("arena/").set(null)
+    // note: removing doesn't really remove thise node it sets it to NULL
+    // so the arena listener needs to look for null values and remove them before
+    // seeing if it's time to evalutate a winner
+    firebase.database().ref("arena/").remove()
     this.setState({
       arena: [],
-      instruction: "winner: " + winner
+      instruction: "winner: " + winner + ". select another attack to play again"
     })
   }
 
@@ -132,10 +138,8 @@ class Game extends Component {
         return (<span key={i}> {player.name} </span>)
       })
     }
-    else {var activePlayers = "there are no players in this game yet"}
+    else {activePlayers = "there are no players in this game yet"}
     // map arena to list of jsx elements
-    console.log("ARENA")
-    console.log(this.state.arena)
     if (this.state.arena.length > 0){
       var attacks = this.state.arena.map((attack, i) => {
         return(
