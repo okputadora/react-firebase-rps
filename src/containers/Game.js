@@ -26,7 +26,7 @@ class Game extends Component {
         this.setState({
           activePlayers: activePlayers,
         })
-        if (activePlayers.length == 2){
+        if (activePlayers.length === 2){
           this.setState({
             instruction: "choose an attack. when both players have thrown their attack the winner will be revealed."
           })
@@ -42,25 +42,13 @@ class Game extends Component {
       console.log("updating arena")
       const arena = snapshot.val()
       if (arena){
+        this.setState({
+          arena: arena
+        })
         console.log("arena "+JSON.stringify(arena))
-        if (this.state.arena.length === 2){
+        if (arena.length === 2){
           console.log("arena length === 2")
-          this.evaluateWinner(arena)
-          this.setState({
-            arena: arena
-          })
-          console.log("STate arena: " + JSON.stringify(this.state.arena))
-          setTimeout(() => {
-            this.setState({
-              arena: []
-            })
-          }, 1000)
-        }
-        else{
-          this.setState({
-            arena: arena,
-          })
-          console.log("STate arena: " + JSON.stringify(this.state.arena))
+          setTimeout(() => this.evaluateWinner(), 2000)
         }
       }
       else{
@@ -91,8 +79,9 @@ class Game extends Component {
 
   shoot(event){
     console.log("SHoot!")
-    // send the attack (rock, paper, scissors) to the board
+    // send the attack (rock, paper, scissors) to the board node in firebase
     var attack = {name: this.props.username, weapon:event.target.id}
+    console.log("state arena: "+JSON.stringify(this.state.arena))
     if (this.state.arena.length > 0){
       var attackId = 1
     }
@@ -103,7 +92,8 @@ class Game extends Component {
     firebase.database().ref("arena/"+attackId).set(attack)
   }
 
-  evaluateWinner(arena){
+  evaluateWinner(){
+    var arena = Object.assign({}, this.state.arena)
     console.log("Evaluating winner")
     var winner;
     var weapon1 = arena[0].weapon
@@ -159,11 +149,22 @@ class Game extends Component {
     // map arena to list of jsx elements
     if (this.state.arena.length > 0){
       var attacks = this.state.arena.map((attack, i) => {
-        return(
-          <div key={i}>
-            <div>{attack.name}: <span>{attack.weapon}</span></div>
-          </div>
-        )
+        // only display the users attack - hide the opponents attack
+        // unless they've both attacked then display both
+        if (attack.name === this.props.username || this.state.arena.length === 2){
+          return(
+            <div key={i}>
+              <div>{attack.name}: <span>{attack.weapon}</span></div>
+            </div>
+          )
+        }
+        else{
+          return(
+            <div key={i}>
+              <div>{attack.name}: <span>#########</span></div>
+            </div>
+          )
+        }
       })
     }
     return (
