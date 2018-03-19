@@ -11,6 +11,12 @@ class Game extends Component {
       arena: [],
       instruction: <button onClick={this.joinGame.bind(this)} className="btn btn-secondary">Join this Game</button>
     }
+    // this will be used to check whether they;ve joined the game yet
+    // they cant start attacking untill they've joined the game
+    this.joined = false;
+    // also, don't let them attack if they're currently waiting on
+    // the opponents attack
+    this.waiting = false;
 
   }
   componentDidMount(){
@@ -34,34 +40,29 @@ class Game extends Component {
       }
     })
     // listen for arena changes
-    // note: when we remove the arena node it is not actually removed it
-    // is set to null. so instead of checking to see if the arena exists
-    // we should check to see if it has the weapon property in the first value
-    // (for some reason it was not allowing us to just check if the value was null)
     firebase.database().ref("arena/").on("value", (snapshot) => {
       console.log("updating arena")
       const arena = snapshot.val()
+      console.log(arena)
       if (arena){
         this.setState({
           arena: arena
         })
-        console.log("arena "+JSON.stringify(arena))
         if (arena.length === 2){
           console.log("arena length === 2")
-          setTimeout(() => this.evaluateWinner(), 2000)
+          this.evaluateWinner(arena)
         }
       }
       else{
         this.setState({
           arena: []
         })
-        console.log("STate arena: " + JSON.stringify(this.state.arena))
       }
     })
   }
 
   joinGame(){
-    console.log("Joined")
+    this.joined = true
     var id = this.state.activePlayers.length
     if (id === 1){
       var instruction = <p>choose an attack. when both players have thrown their attack the winner will be revealed</p>
@@ -78,22 +79,27 @@ class Game extends Component {
   }
 
   shoot(event){
+    // only let the user shoot if they've joined the game and aren't waiting
+    // for their opponents attack
+    if (!this.joined || this.waiting){
+      return
+    }
     console.log("SHoot!")
     // send the attack (rock, paper, scissors) to the board node in firebase
     var attack = {name: this.props.username, weapon:event.target.id}
     console.log("state arena: "+JSON.stringify(this.state.arena))
     if (this.state.arena.length > 0){
-      var attackId = 1
+      var attackId = 1;
     }
     else{attackId = 0}
     this.setState({
       instruction: ""
     })
+    this.waiting = true
     firebase.database().ref("arena/"+attackId).set(attack)
   }
 
-  evaluateWinner(){
-    var arena = Object.assign({}, this.state.arena)
+  evaluateWinner(arena){
     console.log("Evaluating winner")
     var winner;
     var weapon1 = arena[0].weapon
@@ -127,15 +133,19 @@ class Game extends Component {
       }
       else{winner = arena[0].name}
     }
+    // allow the player to attack again
+    this.waiting = false
     // remove the arena to make way for the next round
     // note: removing doesn't really remove thise node it sets it to NULL
     // so the arena listener needs to look for null values and remove them before
     // seeing if it's time to evalutate a winner
-    firebase.database().ref("arena/").remove()
-    this.setState({
-      arena: [],
-      instruction: "winner: " + winner + ". select another attack to play again"
-    })
+    setTimeout(() => {
+      firebase.database().ref("arena/").remove()
+      this.setState({
+        arena: [],
+        instruction: "winner: " + winner + ". select another attack to play again"
+      })
+    }, 2000)
   }
 
   render(){
