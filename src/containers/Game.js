@@ -31,7 +31,7 @@ class Game extends Component {
     // listen for arena changes
     // note: when we remove the arena node it is not actually removed it
     // is set to null. so instead of checking to see if the arena exists
-    // we should check to see if it has the weapon propert in the first value
+    // we should check to see if it has the weapon property in the first value
     // (for some reason it was not allowing us to just check if the value was null)
     firebase.database().ref("arena/").on("value", (snapshot) => {
       console.log("updating arena")
@@ -42,11 +42,22 @@ class Game extends Component {
           if (arena.length === 2){
             console.log("arena length === 2")
             this.evaluateWinner(arena)
+            this.setState({
+              arena: arena
+            })
+            console.log("STate arena: " + JSON.stringify(this.state.arena))
+            setTimeout(() => {
+              this.setState({
+                arena: []
+              })
+            }, 1000)
           }
-          this.setState({
-            arena: arena,
-          })
-          console.log("STate arena: " + JSON.stringify(this.state.arena))
+          else{
+            this.setState({
+              arena: arena,
+            })
+            console.log("STate arena: " + JSON.stringify(this.state.arena))
+          }
         }
         else{
           this.setState({
