@@ -152,7 +152,10 @@ class Game extends Component {
     // map players to list of jsx elements
     if (this.state.activePlayers.length > 0){
       var activePlayers = this.state.activePlayers.map((player, i) => {
-        return (<span key={i}> {player.name} </span>)
+        if (i === 0){
+          var vs = "vs."
+        }
+        return (<span key={i}> {player.name} {vs}</span>)
       })
     }
     else {activePlayers = "there are no players in this game yet"}
