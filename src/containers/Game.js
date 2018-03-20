@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import firebase from 'firebase'
 import style from './style'
 const gameStyle = style.game
+
 class Game extends Component {
   constructor(props){
     super(props)
@@ -35,7 +36,10 @@ class Game extends Component {
         })
         if (activePlayers.length === 2){
           this.setState({
-            instruction: "choose an attack. when both players have thrown their attack the winner will be revealed."
+            instruction: <div>
+              <p>Choose an attack.</p>
+              <p>When both players have thrown their attack the winner will be revealed</p>
+            </div>
           })
         }
       }
@@ -70,14 +74,18 @@ class Game extends Component {
     this.joined = true
     var id = this.state.activePlayers.length
     if (id === 1){
-      var instruction = <p>choose an attack. when both players have thrown their attack the winner will be revealed</p>
+      var instruction = <div>
+        <p>Choose an attack.</p>
+        <p>When both players have thrown their attack the winner will be revealed</p>
+      </div>
       firebase.database().ref("players/"+id).set(this.currentPlayer)
     }
     else if (id === 0){
       firebase.database().ref("players/"+id).set(this.currentPlayer)
-      instruction = <p>waiting for one other player...</p>
+      instruction = <p>Waiting for one other player...</p>
     }
-    else{instruction = <p>there are already two players playing. try back in a bit.</p>}
+    // should eventually allow for multiple games
+    else{instruction = <p>There are already two players playing. Try back in a bit.</p>}
     this.setState({
       instruction: instruction
     })
@@ -105,38 +113,37 @@ class Game extends Component {
   }
 
   evaluateWinner(arena){
-    console.log("Evaluating winner")
     var winner;
     var weapon1 = arena[0].weapon
     var weapon2 = arena[1].weapon
-    console.log(weapon1)
-    console.log(weapon2)
+    var tie = 'It was a tie'
+    var win = 'Winner: '
     if (weapon1 === "rock"){
       if (weapon2 === "rock"){
-        winner = "tie"
+        winner = tie
       }
       else if(weapon2 === "paper"){
-        winner = arena[1].name
+        winner = win + arena[1].name
       }
-      else{winner = arena[0].name}
+      else{winner = win + arena[0].name}
     }
     else if(weapon1 === "paper"){
       if (weapon2 === "paper"){
-        winner = "tie"
+        winner = tie
       }
       else if (weapon2 === "scissors"){
-        winner = arena[1].name
+        winner = win + arena[1].name
       }
-      else{winner = arena[0].name}
+      else{winner = win + arena[0].name}
     }
     else{
       if (weapon2 === "scissors"){
-        winner = "tie"
+        winner = tie
       }
       else if (weapon2 === "rock"){
-        winner = arena[1].name
+        winner = win + arena[1].name
       }
-      else{winner = arena[0].name}
+      else{winner = win + arena[0].name}
     }
     // allow the player to attack again
     this.waiting = false
@@ -148,7 +155,7 @@ class Game extends Component {
       firebase.database().ref("arena/").remove()
       this.setState({
         arena: [],
-        instruction: "winner: " + winner + ". select another attack to play again"
+        instruction: <div><p>{winner}</p><p>select another attack to play again"</p></div>
       })
     }, 2000)
   }
@@ -163,7 +170,7 @@ class Game extends Component {
         return (<span key={i}> {player.name} {vs}</span>)
       })
     }
-    else {activePlayers = "there are no players in this game yet"}
+    else {activePlayers = "There are no players in this game yet"}
     // map arena to list of jsx elements
     if (this.state.arena.length > 0){
       var attacks = this.state.arena.map((attack, i) => {
