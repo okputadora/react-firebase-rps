@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import firebase from 'firebase'
-
+import style from './style'
+const gameStyle = style.game
 class Game extends Component {
   constructor(props){
     super(props)
@@ -187,7 +188,7 @@ class Game extends Component {
     return (
       <div>
         <h2 className="border-bottom">Game</h2>
-        <div className="card">
+        <div className="card rounded" style={gameStyle}>
           <div className="card-header">
             {activePlayers}
           </div>

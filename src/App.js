@@ -18,9 +18,9 @@ class App extends Component {
 
   render() {
     return (
-    <div>
-      <div className="jumbotron bg-dark text-light text-center">
-        <h1>Rock, Paper, Scissors.</h1>
+    <div className="text-align-middle" style={{background: '#fbfbfb', height: '100vh'}}>
+      <div className="bg-dark text-light text-center">
+        <h1 style={{padding: 12}}>Rock, Paper, Scissors.</h1>
       </div>
       {this.state.currentWindow}
     </div>
