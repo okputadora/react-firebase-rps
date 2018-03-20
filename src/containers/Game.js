@@ -7,11 +7,11 @@ class Game extends Component {
     super(props)
     const username = this.props.username
     this.state = {
-      currentPlayer: {name: username},
       activePlayers: [],
       arena: [],
       instruction: <button onClick={this.joinGame.bind(this)} className="btn btn-secondary">Join this Game</button>
     }
+    this.currentPlayer = {name: username},
     // this will be used to check whether they;ve joined the game yet
     // they cant start attacking untill they've joined the game
     this.joined = false;
@@ -71,10 +71,10 @@ class Game extends Component {
     var id = this.state.activePlayers.length
     if (id === 1){
       var instruction = <p>choose an attack. when both players have thrown their attack the winner will be revealed</p>
-      firebase.database().ref("players/"+id).set(this.state.currentPlayer)
+      firebase.database().ref("players/"+id).set(this.currentPlayer)
     }
     else if (id === 0){
-      firebase.database().ref("players/"+id).set(this.state.currentPlayer)
+      firebase.database().ref("players/"+id).set(this.currentPlayer)
       instruction = <p>waiting for one other player...</p>
     }
     else{instruction = <p>there are already two players playing. try back in a bit.</p>}

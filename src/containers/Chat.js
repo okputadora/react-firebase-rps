@@ -44,6 +44,10 @@ class Chat extends Component {
       // the DOM changes. By calling setInterval we're removing it from the
       // call stack until the call stack until all of the other operations
       // have been performed (in this case re-rendering the dom)
+
+      // add an event-listener to the chat input so we can send on enter
+      // var message = document.getElementById("message")
+
     })
   }
 
@@ -55,7 +59,7 @@ class Chat extends Component {
     })
   }
 
-  submitMessage(event){
+  submitMessage(){
     var nextMessage = {
       id: this.state.messages.length,
       text: this.state.message
@@ -66,11 +70,17 @@ class Chat extends Component {
     // changes in the databse and it updates the state as part of its callback
     firebase.database().ref('messages/'+nextMessage.id).set(nextMessage)
   }
+  // submit the message when the user hits enter too
+  // you may be wondering why
+  enterMessage(event){
+    if (event.key === "Enter"){
+      this.submitMessage()
+    }
+  }
 
   // keep the chat window scrolled to the bottom so we're always seeing
   // the newest message
   updateScroll(){
-    console.log("updating scroll")
     let element = document.getElementById("chatList");
     element.scrollTop = element.scrollHeight;
   }
@@ -87,10 +97,10 @@ class Chat extends Component {
           <ul id="chatList" style={chatStyle.list}>
             {currentMessages}
           </ul>
-          <form className="form-inline list-group-item">
-            <input onChange={this.updateMessage.bind(this)} className="form-control" type="text" placeholder="Message..."/>
-            <button onClick={this.submitMessage.bind(this)} id="submit" type="button" className="btn btn-secondary">send</button>
-          </form>
+          <div className="form-inline list-group-item">
+            <input onChange={this.updateMessage.bind(this)} onKeyPress={this.enterMessage.bind(this)} id="message" className="form-control" style={{width: "100%"}} type="text" placeholder="Message..."/>
+          </div>
+          <button onClick={this.submitMessage.bind(this)} id="submit" type="button" className="btn btn-success">send</button>
         </div>
         <span className="font-weight-bold">username: </span><span>{this.props.username}</span>
       </div>
