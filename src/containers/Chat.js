@@ -21,7 +21,7 @@ class Chat extends Component {
     firebaseInit();
     // this.updateMessage = this.updateMessage.bind(this)
     this.state = {
-      message: {id: '', text: ''},
+      message: '',
       messages: []
     }
   }
@@ -53,7 +53,7 @@ class Chat extends Component {
 
   updateMessage(event){
     // capture user activity in input field and set the state
-    let message = this.props.username + ": " + event.target.value
+    let message =  event.target.value
     this.setState({
       message: message
     })
@@ -62,7 +62,8 @@ class Chat extends Component {
   submitMessage(){
     var nextMessage = {
       id: this.state.messages.length,
-      text: this.state.message
+      text: this.state.message,
+      username: this.props.username
     }
     // add the message to the databse and set its id to length of the messages
     // ...we don't need to update state
@@ -87,7 +88,14 @@ class Chat extends Component {
   render(){
     // map this list elements of state to jsx elements
     var currentMessages = this.state.messages.map((message) =>{
-      return (<li className="list-group-item" key={message.id}>{message.text}</li>)
+      // style the messages differently if they're the users vs. the opponent
+      if (message.username === this.props.username){
+        return (<div className="clearfix"><li style={chatStyle.messageOut} key={message.id}>{message.text}</li></div>)
+          }
+          else{
+            return (<div className="clearfix"><li style={chatStyle.messageIn} key={message.id}>
+              <span className="font-weight-bold">{message.username}: </span>{message.text}</li></div>)
+      }
     })
 
     return(
@@ -100,7 +108,7 @@ class Chat extends Component {
           <div className="form-inline list-group-item">
             <input onChange={this.updateMessage.bind(this)} onKeyPress={this.enterMessage.bind(this)} id="message" className="form-control" style={{width: "100%"}} type="text" placeholder="Message..."/>
           </div>
-          <button onClick={this.submitMessage.bind(this)} id="submit" type="button" className="btn btn-success">send</button>
+          <button onClick={this.submitMessage.bind(this)} id="submit" type="button" className="btn btn-secondary">send</button>
         </div>
         <span className="font-weight-bold">username: </span><span>{this.props.username}</span>
       </div>
