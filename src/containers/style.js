@@ -27,17 +27,17 @@ export default {
     },
 
     messageOut: {
-      margin: 15,
+      marginRight: 10,
       padding: 10,
       borderRadius: 10,
       maxWidth: 200,
       listStyleType: "none",
       float: "right",
-      background: "#8CD2BB"
+      background: "#2BE5FF"
     },
 
     messageIn: {
-      margin: 15,
+      marginLeft: 10,
       padding: 10,
       borderRadius: 10,
       maxWidth: 200,

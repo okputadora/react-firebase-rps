@@ -65,6 +65,9 @@ class Chat extends Component {
       text: this.state.message,
       username: this.props.username
     }
+    //clear message from input
+    let message = document.getElementById("message")
+    message.value = ""
     // add the message to the databse and set its id to length of the messages
     // ...we don't need to update state
     // because our firebase function in componentDidMount is listening to
@@ -90,11 +93,11 @@ class Chat extends Component {
     var currentMessages = this.state.messages.map((message) =>{
       // style the messages differently if they're the users vs. the opponent
       if (message.username === this.props.username){
-        return (<div className="clearfix"><li style={chatStyle.messageOut} key={message.id}>{message.text}</li></div>)
+        return (<li className="clearfix" key={message.id}><div style={chatStyle.messageOut}>{message.text}</div></li>)
           }
           else{
-            return (<div className="clearfix"><li style={chatStyle.messageIn} key={message.id}>
-              <span className="font-weight-bold">{message.username}: </span>{message.text}</li></div>)
+            return (<li className="clearfix" key={message.id}><div style={chatStyle.messageIn} >
+              <span className="font-weight-bold">{message.username}: </span>{message.text}</div></li>)
       }
     })
 
