@@ -5,6 +5,7 @@
 *  A multiplayer rock paper scissors game built with React and Firebase
 * Allows two people to play and chat
 ### Remaining Issues/tasks
+* ~~chat auto scrolls to bottom but doesn't allow the user to scrol up~~
 * Need to track the players scores
 * ~~not quite sure how to clear the entire database when the users close their windows~~
 * what I probably want to do is allow for multiple games to be played at once

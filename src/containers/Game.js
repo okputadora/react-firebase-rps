@@ -188,7 +188,7 @@ class Game extends Component {
     return (
       <div>
         <h2 className="border-bottom">Game</h2>
-        <div className="card rounded" style={gameStyle}>
+        <div className="card rounded" style={gameStyle.container}>
           <div className="card-header">
             {activePlayers}
           </div>
@@ -197,7 +197,7 @@ class Game extends Component {
             {this.state.instruction}
           </div>
         </div>
-        <div className="btn-group" role="group">
+        <div className="btn-group" style={gameStyle.weapons}role="group">
           <button onClick={this.shoot.bind(this)} id="rock" type="button" className="btn btn-secondary">Rock</button>
           <button onClick={this.shoot.bind(this)} id="paper" type="button" className="btn btn-secondary">Paper</button>
           <button onClick={this.shoot.bind(this)} id="scissors" type="button" className="btn btn-secondary">Scissors</button>

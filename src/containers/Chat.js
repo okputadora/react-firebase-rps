@@ -37,13 +37,13 @@ class Chat extends Component {
       }
       // every time the chat loads a new message we want to scroll to the
       // bottom so the most recent messages are visible
-      setInterval(() => this.updateScroll(), 0) // interval = 0 !?!?!?
+      setTimeout(() => this.updateScroll(), 0) // interval = 0 !?!?!?
       // whats going on here??? I'm glad you asked...it's quite interesting
       // if we were to call this function outside of an interval it would
       // run before the DOM changes. We want it to scroll to the bottom AFTER
       // the DOM changes. By calling setInterval we're removing it from the
       // call stack until the call stack until all of the other operations
-      // have been performed (in this case re-rendering the dom) 
+      // have been performed (in this case re-rendering the dom)
     })
   }
 
@@ -70,6 +70,7 @@ class Chat extends Component {
   // keep the chat window scrolled to the bottom so we're always seeing
   // the newest message
   updateScroll(){
+    console.log("updating scroll")
     let element = document.getElementById("chatList");
     element.scrollTop = element.scrollHeight;
   }
