@@ -194,8 +194,7 @@ class Game extends Component {
       })
       if (this.state.activePlayers.length === 2){
         var scoreboard = <div className="">
-          {this.props.username}: {this.state.wins}
-          {this.opponent}: {this.state.opponentWins}
+          {this.props.username}: {this.state.wins} --- {this.opponent}: {this.state.opponentWins}
         </div>
       }
     }
@@ -226,8 +225,8 @@ class Game extends Component {
       <div>
         <h2 className="border-bottom">Game</h2>
         <div className="card rounded" style={gameStyle.container}>
-          <div className="card-header">
-            {activePlayers}
+          <div className="card-header d-flex justify-content-between">
+            <div>{activePlayers}</div>
             {scoreboard}
           </div>
           <div className="card-body">
