@@ -10,9 +10,12 @@ class Game extends Component {
     this.state = {
       activePlayers: [],
       arena: [],
+      wins: 0,
+      opponentWins: 0,
       instruction: <button onClick={this.joinGame.bind(this)} className="btn btn-secondary">Join this Game</button>
     }
     this.currentPlayer = {name: username},
+    this.opponent = ''
     // this will be used to check whether they;ve joined the game yet
     // they cant start attacking untill they've joined the game
     this.joined = false;
@@ -34,7 +37,13 @@ class Game extends Component {
         this.setState({
           activePlayers: activePlayers,
         })
+        // save the opponents name
         if (activePlayers.length === 2){
+          activePlayers.forEach((player) => {
+            if (player.name !== this.props.username){
+              this.opponent = player.name
+            }
+          })
           this.setState({
             instruction: <div>
               <p>Choose an attack.</p>
@@ -46,15 +55,12 @@ class Game extends Component {
     })
     // listen for arena changes
     firebase.database().ref("arena/").on("value", (snapshot) => {
-      console.log("updating arena")
       const arena = snapshot.val()
-      console.log(arena)
       if (arena){
         this.setState({
           arena: arena
         })
         if (arena.length === 2){
-          console.log("arena length === 2")
           this.evaluateWinner(arena)
         }
       }
@@ -97,10 +103,8 @@ class Game extends Component {
     if (!this.joined || this.waiting){
       return
     }
-    console.log("SHoot!")
     // send the attack (rock, paper, scissors) to the board node in firebase
     var attack = {name: this.props.username, weapon:event.target.id}
-    console.log("state arena: "+JSON.stringify(this.state.arena))
     if (this.state.arena.length > 0){
       var attackId = 1;
     }
@@ -123,27 +127,46 @@ class Game extends Component {
         winner = tie
       }
       else if(weapon2 === "paper"){
-        winner = win + arena[1].name
+        winner = arena[1].name
       }
-      else{winner = win + arena[0].name}
+      else{winner = arena[0].name}
     }
     else if(weapon1 === "paper"){
       if (weapon2 === "paper"){
         winner = tie
       }
       else if (weapon2 === "scissors"){
-        winner = win + arena[1].name
+        winner = arena[1].name
       }
-      else{winner = win + arena[0].name}
+      else{winner = arena[0].name}
     }
     else{
       if (weapon2 === "scissors"){
         winner = tie
       }
       else if (weapon2 === "rock"){
-        winner = win + arena[1].name
+        winner = arena[1].name
       }
-      else{winner = win + arena[0].name}
+      else{winner = arena[0].name}
+    }
+    // log win or loss for this user
+    if (winner === this.props.username){
+      // note: we don't need to make a copy of this value because it is a
+      // primative type (i.e. not a reference type) so changing its value
+      // does not change the orignal value from which it was copied
+      let currentWins = this.state.wins
+      currentWins++
+      this.setState({
+        wins: currentWins
+      })
+    }
+    else if (winner !== tie){
+      console.log("OPP WON")
+      let opponentWins = this.state.opponentWins
+      opponentWins++
+      this.setState({
+        opponentWins: opponentWins
+      })
     }
     // allow the player to attack again
     this.waiting = false
@@ -155,7 +178,7 @@ class Game extends Component {
       firebase.database().ref("arena/").remove()
       this.setState({
         arena: [],
-        instruction: <div><p>{winner}</p><p>select another attack to play again"</p></div>
+        instruction: <div><p>{win + winner}</p><p>select another attack to play again"</p></div>
       })
     }, 2000)
   }
@@ -169,6 +192,12 @@ class Game extends Component {
         }
         return (<span key={i}> {player.name} {vs}</span>)
       })
+      if (this.state.activePlayers.length === 2){
+        var scoreboard = <div className="">
+          {this.props.username}: {this.state.wins}
+          {this.opponent}: {this.state.opponentWins}
+        </div>
+      }
     }
     else {activePlayers = "There are no players in this game yet"}
     // map arena to list of jsx elements
@@ -192,12 +221,14 @@ class Game extends Component {
         }
       })
     }
+
     return (
       <div>
         <h2 className="border-bottom">Game</h2>
         <div className="card rounded" style={gameStyle.container}>
           <div className="card-header">
             {activePlayers}
+            {scoreboard}
           </div>
           <div className="card-body">
             {attacks}

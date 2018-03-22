@@ -22,10 +22,12 @@ export default {
     },
 
     list: {
-      overflowY: "scroll",
+      overflowY: "auto",
       padding: 0
     },
 
+    // is there a way to save the marginRight, padding, borderRadius, maxWidth
+    // in an object and provide it to both messageIn and messageOut?
     messageOut: {
       marginRight: 10,
       padding: 10,
